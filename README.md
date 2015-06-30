@@ -21,7 +21,7 @@ Please visit: <a href="http://meandmax.github.io/lory/" target="_blank">http://m
 ```javascript
 npm install --save lory.js
 
-var lory = require('lory');
+var lory = require('lory.js');
 ```
 
 ## Install with bower
@@ -104,6 +104,9 @@ grunt karma
     li {
         position: relative;
         display: inline-block;
+
+        // example width has to specified for the different views (media queries)
+        width: 880px;
     }
 ```
 
@@ -254,6 +257,7 @@ grunt karma
 * FireFox
 * Opera
 * Internet Explorer 10+
+* Internet Explorer 9 (graceful, without transitions)
 
 ## Copyright
 
