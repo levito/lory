@@ -170,7 +170,8 @@ footer {
     user-select: none;
 }
 
-.frame {
+.frame,
+.events_log {
     position: relative;
     width: 270px;
     margin: 0 auto;
@@ -196,9 +197,23 @@ footer {
     display: inline-block;
 }
 
-.simple li {
+.simple li,
+.rewind li,
+.events li {
     width: 270px;
     margin-right: 10px;
+}
+
+.percentage .slides {
+    display: block;
+}
+
+.percentage .frame {
+    width: 87.452%;
+}
+
+.percentage li {
+    width: 100%;
 }
 
 .variablewidth li {
@@ -213,6 +228,8 @@ footer {
 }
 
 .simple li:last-child,
+.rewind li:last-child,
+.events li:last-child,
 .variablewidth li:last-child,
 .multipleelements li:last-child,
 .multislides li:last-child,
@@ -240,11 +257,30 @@ footer {
     width: 25px;
 }
 
+.events_log {
+    display: block;
+    font-size: 12px;
+    line-height: 1.6;
+    text-align: center;
+    background-color: #fcfcfc;
+    border: 1px solid #d2d2d2;
+    margin-top: -20px;
+    margin-bottom: 20px;
+}
+
+.events_log > span {
+    display: none;
+}
+
+.events_log > span:nth-last-child(-n+5) {
+    display: block;
+}
+
 @media screen and (min-width: 640px ) {
     /**
      * Demo Page Styles
      */
-    .examplecode, .frame {
+    .examplecode, .frame, .events_log {
         width: 580px;
     }
 
@@ -270,7 +306,9 @@ footer {
         margin: 0 auto 20px;
     }
 
-    .simple li {
+    .simple li,
+    .rewind li,
+    .events li {
         width: 580px;
     }
 
@@ -303,11 +341,14 @@ footer {
         margin: 0 auto 20px;
     }
 
-    .frame {
+    .frame,
+    .events_log {
         width: 880px;
     }
 
-    .simple li {
+    .simple li,
+    .rewind li,
+    .events li {
         width: 880px;
     }
 
