@@ -1,6 +1,6 @@
 
 <p align="center">
-  <img src="http://maximilian-heinz.de/lory-200.png" />
+  <img src="./demo/lory.png" width="200px" />
 </p>
 
 Please visit: <a href="http://meandmax.github.io/lory/" target="_blank">http://meandmax.github.io/lory/</a>
@@ -66,7 +66,7 @@ grunt karma
 ```
 
 <p align="center">
-  <img src="http://maximilian-heinz.de/tests.png" />
+  <img src="./demo/tests.png" />
 </p>
 
 ## Prerequisited markup
@@ -184,6 +184,10 @@ grunt karma
         <th>reset:</th>
         <td>sets the slider back to the starting position and resets the current index (called on Resize event)</td>
     </tr>
+    <tr>
+        <th>destroy:</th>
+        <td>destroys the lory instance by removing all lory specific event listeners and references to the the DOM elements</td>
+    </tr>
 </table>
 
 ## Options
@@ -250,6 +254,10 @@ grunt karma
     <tr>
         <th colspan="2">on.lory.resize</th>
         <td>fires on every resize event</td>
+    </tr>
+    <tr>
+        <th colspan="2">on.lory.destroy</th>
+        <td>fires when the slider instance gets destroyed</td>
     </tr>
 </table>
 
