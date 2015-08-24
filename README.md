@@ -228,6 +228,26 @@ grunt karma
         <td>cubic bezier easing functions: http://easings.net/de</td>
         <td>default: 'ease'</td>
     </tr>
+    <tr>
+        <th>classNameFrame</th>
+        <td>class name for slider frame</td>
+        <td>default: 'js_frame'</td>
+    </tr>
+    <tr>
+        <th>classNameSlideContainer</th>
+        <td>class name for slides container</td>
+        <td>default: 'js_slides'</td>
+    </tr>
+    <tr>
+        <th>classNamePrevCtrl</th>
+        <td>class name for slider previous control</td>
+        <td>default: 'js_prev'</td>
+    </tr>
+    <tr>
+        <th>classNameNextCtrl</th>
+        <td>class name for slider next control</td>
+        <td>default: 'js_next'</td>
+    </tr>
 </table>
 
 ## Events
@@ -254,6 +274,14 @@ grunt karma
     <tr>
         <th colspan="2">on.lory.resize</th>
         <td>fires on every resize event</td>
+    </tr>
+    <tr>
+        <th colspan="2">on.lory.touchstart</th>
+        <td>fires on every slider touchstart event</td>
+    </tr>
+    <tr>
+        <th colspan="2">on.lory.touchend</th>
+        <td>fires on every slider touchend event</td>
     </tr>
     <tr>
         <th colspan="2">on.lory.destroy</th>

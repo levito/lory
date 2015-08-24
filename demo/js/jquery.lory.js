@@ -29,6 +29,7 @@ var transitionEnd;
 (function () {
     var style = document.createElement('_')
         .style;
+
     var prop;
 
     if (style[prop = 'webkitTransition'] === '') {
@@ -75,6 +76,7 @@ var clamp = function (min, max) {
     // Swap min and max if required
     if (min > max) {
         var tmp = min;
+
         min = max;
         max = tmp;
     }
@@ -172,10 +174,10 @@ var lory = function (slider, opts) {
     /**
      * slider DOM elements
      */
-    var frame          = slider.querySelector('.js_frame');
-    var slideContainer = frame.querySelector('.js_slides');
-    var prevCtrl       = slider.querySelector('.js_prev');
-    var nextCtrl       = slider.querySelector('.js_next');
+    var frame;
+    var slideContainer;
+    var prevCtrl;
+    var nextCtrl;
 
     var defaults = {
         /**
@@ -219,9 +221,33 @@ var lory = function (slider, opts) {
         /**
          * number of visible slides or false
          * use infinite or rewind, not both
-         * @type {number}
+         * @infinite {number}
          */
-        infinite: false
+        infinite: false,
+
+        /**
+         * class name for slider frame
+         * @classNameFrame {string}
+         */
+        classNameFrame: 'js_frame',
+
+        /**
+         * class name for slides container
+         * @classNameSlideContainer {string}
+         */
+        classNameSlideContainer: 'js_slides',
+
+        /**
+        * class name for slider prev control
+         * @classNamePrevCtrl {string}
+         */
+        classNamePrevCtrl: 'js_prev',
+
+        /**
+        * class name for slider next control
+         * @classNameNextCtrl {string}
+         */
+        classNameNextCtrl: 'js_next'
     };
 
     /**
@@ -264,6 +290,11 @@ var lory = function (slider, opts) {
 
         options = mergeOptions(opts, defaults);
 
+        frame          = slider.getElementsByClassName(options.classNameFrame)[0];
+        slideContainer = frame.getElementsByClassName(options.classNameSlideContainer)[0];
+        prevCtrl       = slider.getElementsByClassName(options.classNamePrevCtrl)[0];
+        nextCtrl       = slider.getElementsByClassName(options.classNameNextCtrl)[0];
+
         position = {
             x: slideContainer.offsetLeft,
             y: slideContainer.offsetTop
@@ -302,6 +333,12 @@ var lory = function (slider, opts) {
         frameWidth = frame.getBoundingClientRect()
             .width || frame.offsetWidth;
 
+        if (frameWidth === slidesWidth) {
+            slidesWidth = slides.reduce(function (previousValue, slide) {
+                return previousValue + slide.getBoundingClientRect().width || slide.offsetWidth;
+            }, 0);
+        }
+
         index = 0;
 
         if (options.infinite) {
@@ -331,7 +368,7 @@ var lory = function (slider, opts) {
     };
 
     /**
-     * translates to a given position in a in a given time in milliseconds
+     * translates to a given position in a given time in milliseconds
      *
      * @to        {number} number in pixels where to translate to
      * @duration  {number} time in milliseconds for the transistion
@@ -342,10 +379,8 @@ var lory = function (slider, opts) {
 
         if (style) {
             style[transition + 'TimingFunction'] = ease;
-
             style[transition + 'Duration'] = duration + 'ms';
-
-            style[transform] = 'translateX(' + to + 'px)';
+            style[transform] = 'translate3d(' + to + 'px, 0, 0)';
         }
     };
 
@@ -367,13 +402,9 @@ var lory = function (slider, opts) {
             }
         );
 
-        var maxIndex    = slides.length - 1;
         var maxOffset   = Math.round(slidesWidth - frameWidth);
         var limitIndex  = clamp(0, slides.length - 1);
         var duration    = options.slideSpeed;
-
-        maxOffset = Math.round(maxOffset ? maxOffset : slidesWidth * maxIndex);
-
         var limitOffset = clamp(maxOffset * -1, 0);
 
         if (typeof nextIndex !== 'number') {
@@ -470,6 +501,11 @@ var lory = function (slider, opts) {
 
         slideContainer.addEventListener('touchmove', onTouchmove);
         slideContainer.addEventListener('touchend', onTouchend);
+
+        dispatchEvent(
+            slider,
+            'on.lory.touchstart'
+        );
     };
 
     var onTouchmove = function (event) {
@@ -539,6 +575,11 @@ var lory = function (slider, opts) {
          */
         frame.removeEventListener('touchmove');
         frame.removeEventListener('touchend');
+
+        dispatchEvent(
+            slider,
+            'on.lory.touchend'
+        );
     };
 
     var onResize = function () {
@@ -573,18 +614,18 @@ var lory = function (slider, opts) {
         }
 
         // release pointers
-        position              = null;
-        slidesWidth           = null;
-        frameWidth            = null;
-        index                 = null;
-        options               = null;
-        slides                = null;
-        transitionEndCallback = null;
-        slider                = null;
-        frame                 = null;
-        slideContainer        = null;
-        prevCtrl              = null;
-        nextCtrl              = null;
+        position              = undefined;
+        slidesWidth           = undefined;
+        frameWidth            = undefined;
+        index                 = undefined;
+        options               = undefined;
+        slides                = undefined;
+        transitionEndCallback = undefined;
+        slider                = undefined;
+        frame                 = undefined;
+        slideContainer        = undefined;
+        prevCtrl              = undefined;
+        nextCtrl              = undefined;
 
         return null;
     };
