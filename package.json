@@ -1,6 +1,6 @@
 {
   "name": "lory.js",
-  "version": "1.2.2",
+  "version": "1.2.6",
   "description": "Touch enabled minimalistic slider written in vanilla JavaScript.",
   "author": {
     "name": "Maximilian Heinz",
@@ -21,6 +21,17 @@
     "type": "git",
     "url": "https://github.com/meandmax/lory.git"
   },
+  "keywords": [
+    "responsive",
+    "lightweight",
+    "minimalistic",
+    "carousel",
+    "slider",
+    "touch",
+    "slideshow",
+    "jQuery",
+    "mobile"
+  ],
   "main": "./dist/lory.min.js",
   "devDependencies": {
     "grunt": "latest",
