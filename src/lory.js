@@ -40,18 +40,20 @@ export default function lory (slider, opts) {
      * @return {array} array of updated slideContainer elements
      */
     function setupInfinite (slideArray) {
-        let front = slideArray.slice(0, options.infinite);
-        let back  = slideArray.slice(slideArray.length - options.infinite, slideArray.length);
+        const {infinite} = options;
+
+        const front = slideArray.slice(0, infinite);
+        const back  = slideArray.slice(slideArray.length - infinite, slideArray.length);
 
         front.forEach(function (element) {
-            let cloned = element.cloneNode(true);
+            const cloned = element.cloneNode(true);
 
             slideContainer.appendChild(cloned);
         });
 
         back.reverse()
             .forEach(function (element) {
-                let cloned = element.cloneNode(true);
+                const cloned = element.cloneNode(true);
 
                 slideContainer.insertBefore(cloned, slideContainer.firstChild);
             });
@@ -77,7 +79,7 @@ export default function lory (slider, opts) {
      * @ease      {string} easing css property
      */
     function translate (to, duration, ease) {
-        let style = slideContainer && slideContainer.style;
+        const style = slideContainer && slideContainer.style;
 
         if (style) {
             style[prefixes.transition + 'TimingFunction'] = ease;
@@ -95,43 +97,44 @@ export default function lory (slider, opts) {
      * @direction  {boolean}
      */
     function slide (nextIndex, direction) {
-        let currentSlide = index;
-        let nextSlide    = direction ? index + 1 : index - 1;
+        const {slideSpeed, slidesToScroll, infinite, rewind, rewindSpeed, ease} = options;
+
+        let duration = slideSpeed;
+
+        const nextSlide = direction ? index + 1 : index - 1;
+        const maxOffset = Math.round(slidesWidth - frameWidth);
 
         dispatchSliderEvent('before', 'slide', {
-            currentSlide,
+            index,
             nextSlide
         });
 
-        let maxOffset   = Math.round(slidesWidth - frameWidth);
-        let duration    = options.slideSpeed;
-
         if (typeof nextIndex !== 'number') {
             if (direction) {
-                nextIndex = index + options.slidesToScroll;
+                nextIndex = index + slidesToScroll;
             } else {
-                nextIndex = index - options.slidesToScroll;
+                nextIndex = index - slidesToScroll;
             }
         }
 
         nextIndex = Math.min(Math.max(nextIndex, 0), slides.length - 1);
 
-        if (options.infinite && direction === undefined) {
-            nextIndex += options.infinite;
+        if (infinite && direction === undefined) {
+            nextIndex += infinite;
         }
 
         let nextOffset = Math.min(Math.max(slides[nextIndex].offsetLeft * -1, maxOffset * -1), 0);
 
-        if (options.rewind && Math.abs(position.x) === maxOffset && direction) {
+        if (rewind && Math.abs(position.x) === maxOffset && direction) {
             nextOffset = 0;
             nextIndex = 0;
-            duration = options.rewindSpeed;
+            duration = rewindSpeed;
         }
 
         /**
          * translate to the nextOffset by a defined duration and ease function
          */
-        translate(nextOffset, duration, options.ease);
+        translate(nextOffset, duration, ease);
 
         /**
          * update the position with the next position
@@ -146,19 +149,19 @@ export default function lory (slider, opts) {
             index = nextIndex;
         }
 
-        if (options.infinite) {
+        if (infinite) {
             if (Math.abs(nextOffset) === maxOffset && direction) {
-                index = options.infinite;
+                index = infinite;
             }
 
             if (Math.abs(nextOffset) === 0 && !direction) {
-                index = slides.length - (options.infinite * 2);
+                index = slides.length - (infinite * 2);
             }
 
             position.x = slides[index].offsetLeft * -1;
 
             transitionEndCallback = function () {
-                translate(slides[index].offsetLeft * -1, 0, null);
+                translate(slides[index].offsetLeft * -1, 0, undefined);
             };
         }
 
@@ -177,10 +180,12 @@ export default function lory (slider, opts) {
         prefixes = detectPrefixes();
         options = {...defaults, ...opts};
 
-        frame = slider.getElementsByClassName(options.classNameFrame)[0];
-        slideContainer = frame.getElementsByClassName(options.classNameSlideContainer)[0];
-        prevCtrl = slider.getElementsByClassName(options.classNamePrevCtrl)[0];
-        nextCtrl = slider.getElementsByClassName(options.classNameNextCtrl)[0];
+        const {classNameFrame, classNameSlideContainer, classNamePrevCtrl, classNameNextCtrl} = options;
+
+        frame = slider.getElementsByClassName(classNameFrame)[0];
+        slideContainer = frame.getElementsByClassName(classNameSlideContainer)[0];
+        prevCtrl = slider.getElementsByClassName(classNamePrevCtrl)[0];
+        nextCtrl = slider.getElementsByClassName(classNameNextCtrl)[0];
 
         position = {
             x: slideContainer.offsetLeft,
@@ -201,6 +206,8 @@ export default function lory (slider, opts) {
         }
 
         slideContainer.addEventListener('touchstart', onTouchstart);
+        slideContainer.addEventListener('mousedown', onTouchstart);
+        slideContainer.addEventListener('click', onClick);
 
         window.addEventListener('resize', onResize);
 
@@ -306,12 +313,12 @@ export default function lory (slider, opts) {
     }
 
     function onTouchstart (event) {
-        let touches = event.touches[0];
+        const touches = event.touches ? event.touches[0] : event;
+        const {pageX, pageY} = touches;
 
         touchOffset = {
-            x: touches.pageX,
-            y: touches.pageY,
-
+            x: pageX,
+            y: pageY,
             time: Date.now()
         };
 
@@ -320,7 +327,10 @@ export default function lory (slider, opts) {
         delta = {};
 
         slideContainer.addEventListener('touchmove', onTouchmove);
+        slideContainer.addEventListener('mousemove', onTouchmove);
         slideContainer.addEventListener('touchend', onTouchend);
+        slideContainer.addEventListener('mouseup', onTouchend);
+        slideContainer.addEventListener('mouseleave', onTouchend);
 
         dispatchSliderEvent('on', 'touchstart', {
             event
@@ -328,18 +338,19 @@ export default function lory (slider, opts) {
     }
 
     function onTouchmove (event) {
-        let touches = event.touches[0];
+        const touches = event.touches ? event.touches[0] : event;
+        const {pageX, pageY} = touches;
 
         delta = {
-            x: touches.pageX - touchOffset.x,
-            y: touches.pageY - touchOffset.y
+            x: pageX - touchOffset.x,
+            y: pageY - touchOffset.y
         };
 
         if (typeof isScrolling === 'undefined') {
             isScrolling = !!(isScrolling || Math.abs(delta.x) < Math.abs(delta.y));
         }
 
-        if (!isScrolling) {
+        if (!isScrolling && touchOffset) {
             event.preventDefault();
             translate(position.x + delta.x, 0, null);
         }
@@ -355,7 +366,7 @@ export default function lory (slider, opts) {
          * time between touchstart and touchend in milliseconds
          * @duration {number}
          */
-        let duration = Date.now() - touchOffset.time;
+        const duration = touchOffset ? Date.now() - touchOffset.time : undefined;
 
         /**
          * is valid if:
@@ -368,7 +379,7 @@ export default function lory (slider, opts) {
          *
          * @isValidSlide {Boolean}
          */
-        let isValid = Number(duration) < 300 &&
+        const isValid = Number(duration) < 300 &&
             Math.abs(delta.x) > 25 ||
             Math.abs(delta.x) > frameWidth / 3;
 
@@ -381,10 +392,10 @@ export default function lory (slider, opts) {
          *
          * @isOutOfBounds {Boolean}
          */
-        let isOutOfBounds = !index && delta.x > 0 ||
+        const isOutOfBounds = !index && delta.x > 0 ||
             index === slides.length - 1 && delta.x < 0;
 
-        let direction = delta.x < 0;
+        const direction = delta.x < 0;
 
         if (!isScrolling) {
             if (isValid && !isOutOfBounds) {
@@ -394,15 +405,25 @@ export default function lory (slider, opts) {
             }
         }
 
+        touchOffset = undefined;
+
         /**
          * remove eventlisteners after swipe attempt
          */
-        frame.removeEventListener('touchmove');
-        frame.removeEventListener('touchend');
+        slideContainer.removeEventListener('touchmove', onTouchmove);
+        slideContainer.removeEventListener('touchend', onTouchend);
+        slideContainer.removeEventListener('mousemove', onTouchmove);
+        slideContainer.removeEventListener('mouseup', onTouchend);
 
         dispatchSliderEvent('on', 'touchend', {
             event
         });
+    }
+
+    function onClick (event) {
+        if (delta.x) {
+            event.preventDefault();
+        }
     }
 
     function onResize (event) {
